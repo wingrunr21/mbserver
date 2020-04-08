@@ -5,7 +5,7 @@ import (
 	"io"
 	"net"
 
-	"github.com/goburrow/serial"
+	"go.bug.st/serial"
 )
 
 // Server is a Modbus slave with allocated memory for discrete inputs, coils, etc.

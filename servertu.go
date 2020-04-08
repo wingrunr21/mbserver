@@ -4,15 +4,15 @@ import (
 	"io"
 	"log"
 
-	"github.com/goburrow/serial"
+	"go.bug.st/serial"
 )
 
 // ListenRTU starts the Modbus server listening to a serial device.
 // For example:  err := s.ListenRTU(&serial.Config{Address: "/dev/ttyUSB0"})
-func (s *Server) ListenRTU(serialConfig *serial.Config) (err error) {
-	port, err := serial.Open(serialConfig)
+func (s *Server) ListenRTU(targetPort string, mode *serial.Mode) (err error) {
+	port, err := serial.Open(targetPort, mode)
 	if err != nil {
-		log.Fatalf("failed to open %s: %v\n", serialConfig.Address, err)
+		log.Fatalf("failed to open %s: %v\n", targetPort, err)
 	}
 	s.ports = append(s.ports, port)
 	go s.acceptSerialRequests(port)
