@@ -29,14 +29,14 @@ type Request struct {
 }
 
 // NewServer creates a new Modbus server (slave).
-func NewServer() *Server {
+func NewServer(nDiscreteInputs uint, nCoils uint, nHoldingRegisters uint, nInputRegisters uint) *Server {
 	s := &Server{}
 
 	// Allocate Modbus memory maps.
-	s.DiscreteInputs = make([]byte, 65536)
-	s.Coils = make([]byte, 65536)
-	s.HoldingRegisters = make([]uint16, 65536)
-	s.InputRegisters = make([]uint16, 65536)
+	s.DiscreteInputs = make([]byte, nDiscreteInputs)
+	s.Coils = make([]byte, nCoils)
+	s.HoldingRegisters = make([]uint16, nHoldingRegisters)
+	s.InputRegisters = make([]uint16, nInputRegisters)
 
 	// Add default functions.
 	s.function[1] = ReadCoils

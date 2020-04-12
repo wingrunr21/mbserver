@@ -30,7 +30,7 @@ func TestModbusRTU(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 
 	// Server
-	s := NewServer()
+	s := NewServer(65536, 65536, 65536, 65536)
 	err = s.ListenRTU(&serial.Config{
 		Address:  "ttyFOO",
 		BaudRate: 115200,

@@ -8,12 +8,14 @@
 The Golang Modbus Server (Slave) responds to the following Modbus function requests:
 
 Bit access:
+
 - Read Discrete Inputs
 - Read Coils
 - Write Single Coil
 - Write Multiple Coils
 
 16-bit acess:
+
 - Read Input Registers
 - Read Multiple Holding Registers
 - Write Single Holding Register
@@ -21,8 +23,7 @@ Bit access:
 
 TCP and serial RTU access is supported.
 
-The server internally allocates memory for 65536 coils, 65536 discrete inputs, 653356 holding registers and 65536 input registers.
-On start, all values are initialzied to zero.  Modbus requests are processed in the order they are received and will not overlap/interfere with each other.
+On start, all values are initialzied to zero. Modbus requests are processed in the order they are received and will not overlap/interfere with each other.
 
 The golang [mbserver documentation](https://godoc.org/github.com/tbrandon/mbserver).
 
@@ -30,7 +31,7 @@ The golang [mbserver documentation](https://godoc.org/github.com/tbrandon/mbserv
 
 Create a Modbus TCP Server (Slave):
 
-```
+```go
 package main
 
 import (
@@ -41,7 +42,8 @@ import (
 )
 
 func main() {
-	serv := mbserver.NewServer()
+	// number of DiscreteInputs, Coils, HoldingRegisters, and InputRegisters to be allocated
+	serv := mbserver.NewServer(65536, 65536, 65536, 65536)
 	err := serv.ListenTCP("127.0.0.1:1502")
 	if err != nil {
 		log.Printf("%v\n", err)
@@ -54,12 +56,14 @@ func main() {
 	}
 }
 ```
+
 The server will continue to listen until killed (&lt;ctrl>-c).
 Modbus typically uses port 502 (standard users require special permissions to listen on port 502). Change the port number as required.
 Change the address to 0.0.0.0 to listen on all network interfaces.
 
 An example of a client writing and reading holding regsiters:
-```
+
+```go
 package main
 
 import (
@@ -97,8 +101,9 @@ The Golang Modbus Server can listen on multiple TCP ports and serial devices.
 In the following example, the Modbus server will be configured to listen on
 127.0.0.1:1502, 0.0.0.0:3502, /dev/ttyUSB0 and /dev/ttyACM0
 
-```
-	serv := mbserver.NewServer()
+```go
+	// number of DiscreteInputs, Coils, HoldingRegisters, and InputRegisters to be allocated
+	serv := mbserver.NewServer(65536, 65536, 65536, 65536)
 	err := serv.ListenTCP("127.0.0.1:1502")
 	if err != nil {
 		log.Printf("%v\n", err)
@@ -146,15 +151,16 @@ Information on [serial port settings](https://godoc.org/github.com/goburrow/seri
 
 ## Server Customization
 
- RegisterFunctionHandler allows the default server functionality to be overridden for a Modbus function code.
- ```
+RegisterFunctionHandler allows the default server functionality to be overridden for a Modbus function code.
+
+```go
 func (s *Server) RegisterFunctionHandler(funcCode uint8, function func(*Server, Framer) ([]byte, *Exception))
- ```
+```
 
 Example of overriding the default ReadDiscreteInputs funtion:
 
-```
-serv := NewServer()
+```go
+serv := NewServer(65536, 65536, 65536, 65536)
 
 // Override ReadDiscreteInputs function.
 serv.RegisterFunctionHandler(2,
@@ -208,17 +214,20 @@ if err != nil {
 
 fmt.Printf("results %v\n", results)
 ```
+
 Output:
+
 ```
 results [255 255]
 ```
 
 ## Benchmarks
 
-Quanitify server read/write performance.  Benchmarks are for Modbus TCP operations.
+Quanitify server read/write performance. Benchmarks are for Modbus TCP operations.
 
 Run benchmarks:
-```
+
+```bash
 $ go test -bench=.
 BenchmarkModbusWrite1968MultipleCoils-8            50000             30912 ns/op
 BenchmarkModbusRead2000Coils-8                     50000             27875 ns/op
@@ -227,10 +236,12 @@ BenchmarkModbusWrite123MultipleRegisters-8        100000             22655 ns/op
 BenchmarkModbusRead125HoldingRegisters-8          100000             21117 ns/op
 PASS
 ```
-Operations per second are higher when requests are not forced to be  synchronously processed.
+
+Operations per second are higher when requests are not forced to be synchronously processed.
 In the case of simultaneous client access, synchronous Modbus request processing prevents data corruption.
 
 To understand performanc limitations, create a CPU profile graph for the WriteMultipleCoils benchmark:
+
 ```
 go test -bench=.MultipleCoils -cpuprofile=cpu.out
 go tool pprof modbus-server.test cpu.out
@@ -242,6 +253,7 @@ go tool pprof modbus-server.test cpu.out
 There is a [known](https://github.com/golang/go/issues/10001) race condition in the code relating to calling Serial Read() and Close() functions in different go routines.
 
 To check for race conditions, run:
-```
+
+```bash
 go test --race
 ```
