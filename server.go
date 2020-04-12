@@ -4,9 +4,18 @@ package mbserver
 import (
 	"io"
 	"net"
+	"sync"
 
 	"go.bug.st/serial"
 )
+
+type serverState struct {
+	sync.Mutex
+	DiscreteInputs   []byte
+	Coils            []byte
+	HoldingRegisters []uint16
+	InputRegisters   []uint16
+}
 
 // Server is a Modbus slave with allocated memory for discrete inputs, coils, etc.
 type Server struct {
@@ -16,10 +25,7 @@ type Server struct {
 	ports            []serial.Port
 	requestChan      chan *Request
 	function         [256](func(*Server, Framer) ([]byte, *Exception))
-	DiscreteInputs   []byte
-	Coils            []byte
-	HoldingRegisters []uint16
-	InputRegisters   []uint16
+	state            serverState
 }
 
 // Request contains the connection and Modbus frame.
@@ -33,10 +39,12 @@ func NewServer(nDiscreteInputs uint, nCoils uint, nHoldingRegisters uint, nInput
 	s := &Server{}
 
 	// Allocate Modbus memory maps.
-	s.DiscreteInputs = make([]byte, nDiscreteInputs)
-	s.Coils = make([]byte, nCoils)
-	s.HoldingRegisters = make([]uint16, nHoldingRegisters)
-	s.InputRegisters = make([]uint16, nInputRegisters)
+	s.state = serverState{
+		DiscreteInputs: make([]byte, nDiscreteInputs),
+		Coils: make([]byte, nCoils),
+		HoldingRegisters: make([]uint16, nHoldingRegisters),
+		InputRegisters: make([]uint16, nInputRegisters),
+	}
 
 	// Add default functions.
 	s.function[1] = ReadCoils
