@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/tbrandon/mbserver.svg?branch=master)](https://travis-ci.org/tbrandon/mbserver)
-[![Coverage Status](http://codecov.io/github/tbrandon/mbserver/coverage.svg?branch=master)](http://codecov.io/github/tbrandon/mbserver?branch=master)
-[![GoDoc](https://godoc.org/github.com/tbrandon/mbserver?status.svg)](https://godoc.org/github.com/tbrandon/mbserver)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/wingrunr21/mbserver/CI)
+[![codecov](https://codecov.io/gh/wingrunr21/mbserver/branch/master/graph/badge.svg)](https://codecov.io/gh/wingrunr21/mbserver)
+[![GoDoc](https://godoc.org/github.com/wingrunr21/mbserver?status.svg)](https://godoc.org/github.com/wingrunr21/mbserver)
 [![Software License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/tbrandon/mbserver/blob/master/LICENSE)
 
 # Golang Modbus Server (Slave)
